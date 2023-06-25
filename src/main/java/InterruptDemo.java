@@ -3,9 +3,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InterruptDemo {
-//    static volatile boolean stop=false;
-    static AtomicBoolean stop=new AtomicBoolean(false);
-//    public static void main(String[] args) {
+    //    static volatile boolean stop=false;
+    static AtomicBoolean stop = new AtomicBoolean(false);
+
+    //    public static void main(String[] args) {
 //        new Thread(()->{
 //            while (true) {
 //                if (Objects.equals(stop.get(),true)) {
@@ -26,17 +27,17 @@ public class InterruptDemo {
 //            stop.set(true);
 //        },"t2").start();
 //    }
-public static void main(String[] args) {
-    Thread t1=new Thread(()->{
+    public static void main(String[] args) {
+        Thread t1 = new Thread(() -> {
             while (true) {
                 if (Thread.currentThread().isInterrupted()) {
-                    System.out.println(Thread.currentThread().getName()+"stop");
+                    System.out.println(Thread.currentThread().getName() + "stop");
                     break;
                 }
                 System.out.println(Thread.currentThread().getName() + "hello");
             }
-        },"t1");
-    t1.start();
+        }, "t1");
+        t1.start();
 
         try {
             TimeUnit.MILLISECONDS.sleep(20);
@@ -44,7 +45,7 @@ public static void main(String[] args) {
             e.printStackTrace();
         }
 
-        new Thread(t1::interrupt,"t2").start();
+        new Thread(t1::interrupt, "t2").start();
 
-}
+    }
 }
