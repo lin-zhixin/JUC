@@ -190,7 +190,7 @@ public class DeadLockDemo {
 //
 //
 //    }
-//    解决方案3：一次性全部申请 使用一次sync解决 破坏循环等待条件
+//    解决方案3：一次性全部申请 使用一次sync解决 破坏持有并请求条件
     public static void main(String[] args) {
 
 
