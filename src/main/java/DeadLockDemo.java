@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DeadLockDemo {
     static O1 o1 = new O1();
     static O2 o2 = new O2();
-    private static final Object lock=new Object();
+    private static final Object lock = new Object();
 
     //    public static void main(String[] args) {
 //        Object o1 = new Object();
@@ -196,7 +196,7 @@ public class DeadLockDemo {
 
         new Thread(() -> {
 //            能申请到lock说明能够锁住唯一(因为是static 属于类对象的 所以只有一个)的lock.class对象，这样说明只有当前实例的对象能够操作当前类的所有变量 其他实例都因为申请不成功就被拒之门外
-            synchronized (lock){
+            synchronized (lock) {
                 System.out.println("t1 get o1");
                 try {
                     TimeUnit.SECONDS.sleep(1);
@@ -211,7 +211,7 @@ public class DeadLockDemo {
         }, "t1").start();
 
         new Thread(() -> {
-            synchronized (lock){
+            synchronized (lock) {
                 System.out.println("t2 get o1");
                 try {
                     TimeUnit.SECONDS.sleep(1);
@@ -232,6 +232,34 @@ public class DeadLockDemo {
 }
 
 class O1 extends ReentrantLock {
+//    private final Node<K, V>[] initTable() {
+//        Node<K, V>[] tab;
+//        int sc;
+//        while ((tab = table) == null || tab.length == 0) {
+//            // b1
+//            if ((sc = sizeCtl) < 0)
+//                Thread.yield(); // lost initialization race; just spin
+//            else if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {
+//                try {
+////                    双重校验：防止在b1处停止的线程在别的线程初始化之后又开始进行了 if ((sc = sizeCtl) < 0) 里面的(sc = sizeCtl) 操作导致cas成功，进入到这个try里面，
+////                    因此再次做if判断，if不成功会再次进行finally 里面的sizeCtl = sc;
+////                    把 - 1 的sizeCtl 改回到原来的sc
+//                    if ((tab = table) == null || tab.length == 0) {
+//
+//                        int n = (sc > 0) ? sc : DEFAULT_CAPACITY;
+//                        @SuppressWarnings("unchecked")
+//                        Node<K, V>[] nt = (Node<K, V>[]) new Node<?, ?>[n];
+//                        table = tab = nt;
+//                        sc = n - (n >>> 2);
+//                    }
+//                } finally {
+//                    sizeCtl = sc;
+//                }
+//                break;
+//            }
+//        }
+//        return tab;
+//    }
 }
 
 class O2 extends ReentrantLock {
