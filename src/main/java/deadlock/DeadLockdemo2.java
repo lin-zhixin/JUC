@@ -1,3 +1,5 @@
+package deadlock;
+
 public class DeadLockdemo2 {
     public static void main(String[] args) {
         Object o1=new Object();

@@ -12,8 +12,8 @@ public class SequencePrintNumbers {
 //
 //    使用synchronized和wait/notify
 //    使用ReentrantLock和Condition
-//    使用Semaphore
 //    使用AtomicInteger和CAS
+//    使用Semaphore
 //    使用CyclicBarrier
 
     public static int i = 0;
@@ -133,6 +133,7 @@ public class SequencePrintNumbers {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
+                    System.out.println("after b.signal()");
                     relock.unlock();
                 }
             }
@@ -228,36 +229,37 @@ public class SequencePrintNumbers {
 
     public void print5() {
         new Thread(() -> {
-            for (int j = 0; j < 100;) {
-                while (ai.get() % 3 == 0) {
-                    System.out.println(Thread.currentThread().getName() + "：" + ai);
-                    ai.compareAndSet(ai.get(), (ai.get() + 1) % 3);
-                    j++;
-                }
-            }
-        }, "t0").start();
-        new Thread(() -> {
-            for (int j = 0; j < 100;) {
-                while (ai.get() % 3 == 1) {
-                    System.out.println(Thread.currentThread().getName() + "：" + ai);
-                    ai.compareAndSet(ai.get(), (ai.get() + 1) % 3);
+            for (int j = 0; j < 500; ) {
+                if (ai.get() == 0) {
+                    System.out.println(Thread.currentThread().getName() + " a");
+                    ai.compareAndSet(0, 1);
                     j++;
                 }
             }
         }, "t1").start();
         new Thread(() -> {
-            for (int j = 0; j < 100;) {
-                while (ai.get() % 3 == 2) {
-                    System.out.println(Thread.currentThread().getName() + "：" + ai);
-                    ai.compareAndSet(ai.get(), (ai.get() + 1) % 3);
+            for (int j = 0; j < 500; ) {
+                if (ai.get() == 1) {
+                    System.out.println(Thread.currentThread().getName() + "  b");
+                    ai.compareAndSet(1, 2);
                     j++;
                 }
             }
         }, "t2").start();
+        new Thread(() -> {
+            for (int j = 0; j < 500; ) {
+                if (ai.get() == 2) {
+                    System.out.println(Thread.currentThread().getName() + "   c");
+                    ai.compareAndSet(2, 0);
+                    j++;
+                }
+            }
+        }, "t3").start();
+
     }
 
 
-    public void print6(){
+    public void print6() {
 
     }
 

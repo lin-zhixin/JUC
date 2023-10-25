@@ -9,7 +9,7 @@ public class GCtest {
         for (int i = 0; i < 1000; i++) {
             byte[] arr = new byte[1024 * 100];//100KB
             list.add(arr);
-            Thread.sleep(120);
+            Thread.sleep(1200);
         }
     }
 }

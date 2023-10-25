@@ -1,4 +1,4 @@
-import org.junit.Test;
+package deadlock;
 
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -107,128 +107,119 @@ public class DeadLockDemo {
 //
 //    }
 //    解决方案2：使用可重入锁 tryLock()； 破坏不剥夺条件 就是tryLock不成功就释放锁
-//    public static void main(String[] args) {
-//        O1 o1 = new O1();
-//        O2 o2 = new O2();
-//
-//
-//        new Thread(() -> {
-//
-//            while (o1.tryLock()) {
-//                try {
-//                    System.out.println("t1 get o1");
-//                    try {
-//                        TimeUnit.SECONDS.sleep(2);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    if (o2.tryLock()) {
-//                        try {
-//                            System.out.println("t1 get o2");
-//                            try {
-//                                TimeUnit.SECONDS.sleep(2);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                            break;
-//                        } finally {
-//                            o2.unlock();
-//                            System.out.println("t1 out o2");
-//
-//                        }
-//
-//                    }
-//
-//                } finally {
-//                    o1.unlock();
-//                    System.out.println("t1 out o1");
-//
-//                }
-//            }
-//        }, "t1").start();
-//
-//        new Thread(() -> {
-//            try {
-//                while (o1.tryLock(5,TimeUnit.SECONDS)) {
-//                    try {
-//                        System.out.println("t2 get o1");
-//                        try {
-//                            TimeUnit.SECONDS.sleep(2);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                        if (o2.tryLock(5,TimeUnit.SECONDS)) {
-//                            try {
-//                                System.out.println("t2 get o2");
-//                                try {
-//                                    TimeUnit.SECONDS.sleep(2);
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//
-//                                break;
-//                            } finally {
-//                                o2.unlock();
-//                                System.out.println("t2 out o2");
-//
-//                            }
-//
-//                        }
-//
-//                    } finally {
-//                        o1.unlock();
-//                        System.out.println("t2 out o1");
-//
-//                    }
-//                }
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }, "t2").start();
-//
-//
-//    }
-//    解决方案3：一次性全部申请 使用一次sync解决 破坏持有并请求条件
     public static void main(String[] args) {
-
+        ReentrantLock o1 = new ReentrantLock();
+        ReentrantLock o2 = new ReentrantLock();
 
         new Thread(() -> {
-//            能申请到lock说明能够锁住唯一(因为是static 属于类对象的 所以只有一个)的lock.class对象，这样说明只有当前实例的对象能够操作当前类的所有变量 其他实例都因为申请不成功就被拒之门外
-            synchronized (lock) {
-                System.out.println("t1 get o1");
+            while (true) {
+                if (o1.tryLock()) {
+                    try {
+                        System.out.println(Thread.currentThread().getName() + " get o1");
+                        if (o2.tryLock()) {
+                            try {
+                                System.out.println(Thread.currentThread().getName() + " get o2");
+                                try {
+                                    Thread.sleep(2000);
+                                    break;
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            } finally {
+                                o2.unlock();
+                                System.out.println(Thread.currentThread().getName() + " out o2");
+                            }
+                        }
+                    } finally {
+                        o1.unlock();
+                        System.out.println(Thread.currentThread().getName() + " out o1");
+                    }
+                }
                 try {
-                    TimeUnit.SECONDS.sleep(1);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println("t1 get o2");
-//                System.out.println(o1);
-
             }
+
 
         }, "t1").start();
 
         new Thread(() -> {
-            synchronized (lock) {
-                System.out.println("t2 get o1");
+            while (true) {
+                if (o2.tryLock()) {
+                    try {
+                        System.out.println(Thread.currentThread().getName() + " get o2");
+                        if (o1.tryLock()) {
+                            try {
+                                System.out.println(Thread.currentThread().getName() + " get o1");
+                                try {
+                                    Thread.sleep(2000);
+                                    break;
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            } finally {
+                                o1.unlock();
+                                System.out.println(Thread.currentThread().getName() + " out o1");
+                            }
+                        }
+                    } finally {
+                        o2.unlock();
+                        System.out.println(Thread.currentThread().getName() + " out o2");
+                    }
+                }
                 try {
-                    TimeUnit.SECONDS.sleep(1);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                System.out.println("t2 get o2");
-//                System.out.println(o1);
-
             }
-//            o1.wait();
 
         }, "t2").start();
-
-
     }
+
+//    解决方案3：一次性全部申请 使用一次sync解决 破坏持有并请求条件
+//    public static void main(String[] args) {
+//
+//
+//        new Thread(() -> {
+////            能申请到lock说明能够锁住唯一(因为是static 属于类对象的 所以只有一个)的lock.class对象，这样说明只有当前实例的对象能够操作当前类的所有变量 其他实例都因为申请不成功就被拒之门外
+////             也可以使用synchronized (DeadLockDemo.class)
+//            synchronized (lock) {
+//                System.out.println("t1 get o1");
+//                try {
+//                    TimeUnit.SECONDS.sleep(1);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                System.out.println("t1 get o2");
+////                System.out.println(o1);
+//
+//            }
+//
+//        }, "t1").start();
+//
+//        new Thread(() -> {
+//            synchronized (lock) {
+//                System.out.println("t2 get o1");
+//                try {
+//                    TimeUnit.SECONDS.sleep(1);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                System.out.println("t2 get o2");
+////                System.out.println(o1);
+//
+//            }
+////            o1.wait();
+//
+//        }, "t2").start();
+//
+//
+//    }
 }
 
 class O1 extends ReentrantLock {

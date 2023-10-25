@@ -1,18 +1,22 @@
 package singleLen;
 
 import java.util.Objects;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class SingletenTest {
-    private volatile static SingletenTest instance;
+    private static volatile SingletenTest singleton;
 
     public static SingletenTest getInstance() {
-        if (Objects.isNull(instance)) {
+//        FixedThreadPool
+
+//        ScheduledThreadPoolExecutor
+        if (singleton == null) {
             synchronized (SingletenTest.class) {
-                if (Objects.isNull(instance)) {
-                    instance = new SingletenTest();
+                if (singleton == null) {
+                    singleton = new SingletenTest();
                 }
             }
         }
-        return instance;
+        return singleton;
     }
 }
