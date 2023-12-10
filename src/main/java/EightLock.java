@@ -41,17 +41,19 @@ public class EightLock {
         Phone phone2 = new Phone();
 
         new Thread(() -> {
-            try {
-                phone1.sendEmail();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                phone1.sendEmail();
+                phone1.hello();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         }).start();
 
         TimeUnit.MILLISECONDS.sleep(200);
 
         new Thread(() -> {
-            phone2.sendSMS();
+//            phone2.sendSMS();
+            phone2.hello();
         }).start();
 
         ReentrantLock lock = new ReentrantLock();
@@ -62,6 +64,7 @@ public class EightLock {
 }
 
 class Phone {
+    private static Object staticObject=new Object();
 
     public static synchronized void sendEmail() throws InterruptedException {
         TimeUnit.MILLISECONDS.sleep(3000);
@@ -73,7 +76,16 @@ class Phone {
     }
 
     public  void hello() {
-        System.out.println("hello");
+        System.out.println("hello1");
+        synchronized (staticObject){
+
+            System.out.println("hello");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 

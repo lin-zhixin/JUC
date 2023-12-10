@@ -15,6 +15,5 @@ public class LinkedHashMapTest {
         linkedHashMap.get("name");
 
         linkedHashMap.forEach((k, v) -> System.out.println(k + "：" + v));
-        ReentrantLock
     }
 }
